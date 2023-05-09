@@ -5,6 +5,7 @@
   >
     <MessageRow
       v-for="message in messages"
+      :key="message.id"
       :message="message"
       :openChat="openChat"
     />

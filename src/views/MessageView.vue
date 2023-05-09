@@ -22,7 +22,11 @@
         id="MessagesSection"
         class="pt-20 h-[calc(100vh-65px)] w-[calc(100vw-420px)] overflow-auto fixed touch-auto"
       >
-        <div class="px-12 text-sm" v-for="msg in props.openedChat.msgs">
+        <div
+          class="px-12 text-sm"
+          v-for="(msg, index) in props.openedChat.msgs"
+          :key="index"
+        >
           <div v-if="msg.send" class="flex w-[calc(100%-100px)]">
             <div class="inline-block bg-gray-100 p-2 rounded-md my-6">
               {{ msg.text }}
