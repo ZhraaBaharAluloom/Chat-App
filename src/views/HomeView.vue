@@ -32,7 +32,7 @@
     <ChatView class="mt-[100px]" :messages="messages" :openChat="openChat" />
 
     <div v-if="open">
-      <MessageView :messages="messages" :openedChat="openedChat" />
+      <MessageView :openedChat="openedChat" />
     </div>
 
     <div v-else>
@@ -48,9 +48,11 @@
                 width="375"
               />
             </div>
+
             <div class="text-[32px] text-gray-500 font-light mt-10">
               WhatsApp Web
             </div>
+
             <div class="text-[14px] text-gray-500 font-light mt-1">
               Welcome to the real world!
             </div>
@@ -63,15 +65,19 @@
 
 <script setup>
 import { ref } from "vue";
+// Data
+import messages from "../messages";
+// Views
 import ChatView from "./ChatView.vue";
+import MessageView from "./MessageView.vue";
+// Icons
 import AccountGroupIcon from "vue-material-design-icons/AccountGroup.vue";
 import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
-import MessageView from "./MessageView.vue";
-import messages from "../messages";
 
 let open = ref(false);
 let openedChat = ref();
+
 const openChat = (message) => {
   open.value = true;
   openedChat.value = message;

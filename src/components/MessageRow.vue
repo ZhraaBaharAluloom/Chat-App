@@ -2,7 +2,7 @@
   <div class="">
     <div
       class="flex w-full px-4 py-3 items-center cursor-pointer"
-      @click="openChat(props.message)"
+      @click="openChat(message)"
     >
       <img
         :src="profileImg"
@@ -11,9 +11,7 @@
       />
       <div class="w-full">
         <div class="flex justify-between items-center">
-          <div class="text-[15px] text-gray-600">
-            {{ username }}
-          </div>
+          <div class="text-[15px] text-gray-600">{{ username }}</div>
           <div class="text-[12px] text-gray-600 fixed left-[300px]">
             {{ date }}
           </div>
@@ -34,9 +32,15 @@
 
 <script setup>
 import CheckAllIcon from "vue-material-design-icons/CheckAll.vue";
+
 const props = defineProps({
-  message: {},
-  openChat: {},
+  message: {
+    type: Object,
+  },
+  openChat: {
+    type: Function,
+  },
 });
-const { username, date, msgs, profileImg } = props.message;
+const { message, openChat } = props;
+const { username, date, msgs, profileImg } = message;
 </script>

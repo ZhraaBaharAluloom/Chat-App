@@ -71,10 +71,12 @@ import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
 import EmoticonExcitedOutlineIcon from "vue-material-design-icons/EmoticonExcitedOutline.vue";
 import PaperclipIcon from "vue-material-design-icons/Paperclip.vue";
 import SendIcon from "vue-material-design-icons/Send.vue";
+
 const props = defineProps({
-  openedChat: {},
+  openedChat: {
+    type: Object,
+  },
 });
-console.log("🚀 ~ file: MessageView.vue:77 ~ openedChat:", props.openedChat);
 </script>
 
 <style scoped></style>
