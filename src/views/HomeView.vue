@@ -29,7 +29,7 @@
         </div>
       </div>
     </div>
-    <ChatView class="mt-[100px]" :messages="messages" :openChat="openChat" />
+    <ChatView class="mt-[100px]" :chats="chats" :openChat="openChat" />
 
     <div v-if="open">
       <MessageView :openedChat="openedChat" />
@@ -66,7 +66,7 @@
 <script setup>
 import { ref } from "vue";
 // Data
-import messages from "../messages";
+// import messages from "../messages";
 // Views
 import ChatView from "./ChatView.vue";
 import MessageView from "./MessageView.vue";
@@ -75,6 +75,14 @@ import AccountGroupIcon from "vue-material-design-icons/AccountGroup.vue";
 import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
 
+/* TODO:
+1. install axios 
+2. import it here
+3. create a function fetchChats that fetches chats from BE - await axios.get(`http://localhost:3000/chats`) -
+4. store response.data in chats array
+*/
+
+let chats = ref([]);
 let open = ref(false);
 let openedChat = ref();
 

@@ -1,12 +1,12 @@
 <template>
   <div
-    id="Messages"
+    id="chats"
     class="pt-1 z-0 overflow-auto fixed h-[calc(100vh-100px)] w-[420px]"
   >
     <MessageRow
-      v-for="message in messages"
-      :key="message.id"
-      :message="message"
+      v-for="chat in chats"
+      :key="chat.id"
+      :chat="chat"
       :openChat="openChat"
     />
   </div>
@@ -16,7 +16,7 @@
 import MessageRow from "../components/MessageRow.vue";
 
 const props = defineProps({
-  messages: {
+  chats: {
     type: [Array],
   },
   openChat: {
@@ -24,7 +24,7 @@ const props = defineProps({
   },
 });
 
-const { messages, openChat } = props;
+const { chats, openChat } = props;
 </script>
 
 <style scoped></style>
