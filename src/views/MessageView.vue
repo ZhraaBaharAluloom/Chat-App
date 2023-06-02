@@ -12,7 +12,8 @@
               class="rounded-full mx-1 w-10"
             />
             <div class="text-gray=500 ml-1 font-semibold">
-              {{ props.openedChat.username }}
+              Username
+              <!-- {{ openedChat.username || "Username" }} -->
             </div>
           </div>
           <DotsVerticalIcon fillColor="#515151" />
@@ -24,12 +25,12 @@
       >
         <div
           class="px-12 text-sm"
-          v-for="(msg, index) in props.openedChat.msgs"
+          v-for="(chat, index) in openedChat"
           :key="index"
         >
-          <div v-if="msg.send" class="flex w-[calc(100%-100px)]">
+          <div v-if="chat.send" class="flex w-[calc(100%-100px)]">
             <div class="inline-block bg-gray-100 p-2 rounded-md my-6">
-              {{ msg.text }}
+              {{ chat.text }}
             </div>
           </div>
 
@@ -38,7 +39,7 @@
             class="flex justify-end float-right space-x-1 w-[calc(100%-100px)]"
           >
             <div class="inline-block bg-green-200 p-2 rounded-md my-1">
-              {{ msg.text }}
+              {{ chat.text }}
             </div>
           </div>
         </div>
@@ -57,10 +58,12 @@
             autocomplete="off"
             type="text"
             placeholder="Message"
+            v-model="messageInput"
           />
           <button
             type="submit"
             class="ml-3 p-2 w-12 flex items-center justify-center"
+            @click="handleCreateMsg"
           >
             <SendIcon fillColor="#515151" />
           </button>
@@ -71,6 +74,7 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
 import EmoticonExcitedOutlineIcon from "vue-material-design-icons/EmoticonExcitedOutline.vue";
 import PaperclipIcon from "vue-material-design-icons/Paperclip.vue";
@@ -78,9 +82,20 @@ import SendIcon from "vue-material-design-icons/Send.vue";
 
 const props = defineProps({
   openedChat: {
-    type: Object,
+    type: Array,
   },
 });
+const messageInput = ref("");
+
+const emit = defineEmits(["createChat"]);
+
+const handleCreateMsg = () => {
+  const newMgs = {
+    send: true,
+    text: messageInput.value,
+  };
+  emit("createChat", newMgs);
+};
 </script>
 
 <style scoped></style>

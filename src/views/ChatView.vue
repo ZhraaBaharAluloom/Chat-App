@@ -3,28 +3,22 @@
     id="chats"
     class="pt-1 z-0 overflow-auto fixed h-[calc(100vh-100px)] w-[420px]"
   >
-    <MessageRow
-      v-for="chat in chats"
-      :key="chat.id"
-      :chat="chat"
-      :openChat="openChat"
-    />
+    <MessageRow :chatsList="chatsList" :openChat="openChat" />
   </div>
 </template>
 
 <script setup>
+// import { watch, watchEffect } from "vue";
 import MessageRow from "../components/MessageRow.vue";
 
 const props = defineProps({
-  chats: {
-    type: [Array],
+  chatsList: {
+    type: Array,
   },
   openChat: {
     type: Function,
   },
 });
-
-const { chats, openChat } = props;
 </script>
 
 <style scoped></style>
