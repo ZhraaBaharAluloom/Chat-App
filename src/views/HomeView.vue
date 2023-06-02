@@ -21,7 +21,7 @@
         >
           <MagnifyIcon fillColor="#515151" :size="18" class="ml-2" />
           <input
-            class="ml-5 appearance-non w-full bg-[#F0F0F0] py-1.5 px-2.5 text-gray-700 leading-tight focus:outline-none focus:shadow-outline placeholder text-sm placeholder: text-gray-500"
+            class="ml-5 appearance-non w-full bg-[#F0F0F0] py-1.5 px-2.5 text-gray-700 leading-tight focus:outline-none focus:shadow-outline placeholder text-sm placeholder:text-gray-500"
             autocomplete="off"
             type="text"
             placeholder="Start a new chat"
@@ -101,17 +101,14 @@ const getChats = async () => {
     console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
   }
 };
-// const createChat = async () => {
-//   try {
-//     const newMsg = {
-//       send: false,
-//       text: "Hello!",
-//     };
-//     await axios.post(`http://localhost:3000/chats`, newMsg);
-//   } catch (error) {
-//     console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
-//   }
-// };
+const createChat = async (newMsg) => {
+  try {
+    const newChat = await axios.post(`http://localhost:3000/chats`, newMsg);
+    chatsList.value.push(newChat.data.newChat);
+  } catch (error) {
+    console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
+  }
+};
 
 const openChat = (message) => {
   console.log("🚀 ~ file: HomeView.vue:119 ~ openChat ~ message:", message);
