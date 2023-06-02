@@ -29,10 +29,18 @@
         </div>
       </div>
     </div>
-    <ChatView class="mt-[100px]" :chats="chats" :openChat="openChat" />
-
+    <div v-if="isLoading">
+      <p class="mt-[100px]">Loading ...</p>
+    </div>
+    <div v-else>
+      <ChatView
+        class="mt-[100px]"
+        :chatsList="chatsList"
+        :openChat="openChat"
+      />
+    </div>
     <div v-if="open">
-      <MessageView :openedChat="openedChat" />
+      <MessageView :openedChat="openedChat" @createChat="createChat" />
     </div>
 
     <div v-else>
@@ -64,30 +72,54 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-// Data
-// import messages from "../messages";
-// Views
+import { onMounted, onUpdated, ref, watch } from "vue";
+
 import ChatView from "./ChatView.vue";
 import MessageView from "./MessageView.vue";
-// Icons
+
 import AccountGroupIcon from "vue-material-design-icons/AccountGroup.vue";
 import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
+import axios from "axios";
 
-/* TODO:
-1. install axios 
-2. import it here
-3. create a function fetchChats that fetches chats from BE - await axios.get(`http://localhost:3000/chats`) -
-4. store response.data in chats array
+/* TODO2:
+3. use pinia for state management
 */
 
-let chats = ref([]);
+let chatsList = ref([]);
 let open = ref(false);
-let openedChat = ref();
+let openedChat = ref([]);
+let isLoading = ref(true);
+
+const getChats = async () => {
+  try {
+    isLoading.value = true;
+    const chatsData = await axios.get(`http://localhost:3000/chats`);
+    chatsList.value = chatsData.data.Chats;
+    isLoading.value = false;
+  } catch (error) {
+    console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
+  }
+};
+// const createChat = async () => {
+//   try {
+//     const newMsg = {
+//       send: false,
+//       text: "Hello!",
+//     };
+//     await axios.post(`http://localhost:3000/chats`, newMsg);
+//   } catch (error) {
+//     console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
+//   }
+// };
 
 const openChat = (message) => {
+  console.log("🚀 ~ file: HomeView.vue:119 ~ openChat ~ message:", message);
   open.value = true;
   openedChat.value = message;
 };
+
+onMounted(async () => {
+  await getChats();
+});
 </script>
