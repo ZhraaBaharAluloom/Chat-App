@@ -2,26 +2,29 @@
   <div class="">
     <div
       class="flex w-full px-4 py-3 items-center cursor-pointer"
-      @click="openChat(chat)"
+      @click="openChat(chatsList)"
     >
       <img
-        :src="profileImg"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/2048px-Circle-icons-profile.svg.png"
         alt="profile-image"
         class="rounded-full mr-4 w-12"
       />
       <div class="w-full">
         <div class="flex justify-between items-center">
-          <div class="text-[15px] text-gray-600">{{ username }}</div>
-          <!-- <div class="text-[12px] text-gray-600 fixed left-[300px]">
-            {{ date }}
-          </div> -->
+          <div class="text-[15px] text-gray-600">
+            Username
+            <!-- {{ username || "Username" }} -->
+          </div>
+          <div class="text-[12px] text-gray-600 fixed left-60">
+            {{ chatsList[chatsList.length - 1].formattedCreatedDate }}
+          </div>
         </div>
         <div class="flex items-center">
           <CheckAllIcon :size="18" class="mr-1" />
           <div
             class="text-[15px] text-gray-500 flex items-center justify-between w-full truncate"
           >
-            {{ msgs[msgs.length - 1].text }}
+            {{ chatsList[chatsList.length - 1].text }}
           </div>
         </div>
       </div>
@@ -34,13 +37,11 @@
 import CheckAllIcon from "vue-material-design-icons/CheckAll.vue";
 
 const props = defineProps({
-  chat: {
-    type: Object,
+  chatsList: {
+    type: Array,
   },
   openChat: {
     type: Function,
   },
 });
-const { chat, openChat } = props;
-const { username, msgs, profileImg } = chat;
 </script>
