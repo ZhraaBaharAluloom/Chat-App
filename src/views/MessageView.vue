@@ -33,8 +33,16 @@
             <div class="inline-block bg-gray-100 p-2 rounded-md my-6">
               <div class="flex gap-4">
                 <span class="flex gap-1">
-                  <MdiTrashCanOutlineIcon :size="18" class="text-red-900" />
-                  <EditIcon :size="18" class="text-gray-600" />
+                  <MdiTrashCanOutlineIcon
+                    :size="18"
+                    class="text-red-900 cursor-pointer"
+                    @click="handleDeleteMsg(chat)"
+                  />
+                  <EditIcon
+                    :size="18"
+                    class="text-gray-600 cursor-pointer"
+                    @click="handleEditMsg(chat)"
+                  />
                 </span>
                 {{ chat.text }}
               </div>
@@ -49,8 +57,16 @@
               <div class="flex gap-4">
                 {{ chat.text }}
                 <span class="flex gap-1">
-                  <MdiTrashCanOutlineIcon :size="18" class="text-red-900" />
-                  <EditIcon :size="18" class="text-gray-600" />
+                  <MdiTrashCanOutlineIcon
+                    @click="handleDeleteMsg(chat)"
+                    :size="18"
+                    class="text-red-900 cursor-pointer"
+                  />
+                  <EditIcon
+                    :size="18"
+                    class="text-gray-600 cursor-pointer"
+                    @click="handleEditMsg(chat)"
+                  />
                 </span>
               </div>
             </div>
@@ -72,12 +88,12 @@
             type="text"
             placeholder="Message"
             v-model="messageInput"
-            @keyup.enter="handleCreateMsg"
+            @keyup.enter="handleCreateOrEdit"
           />
           <button
             type="submit"
             class="ml-3 p-2 w-12 flex items-center justify-center"
-            @click="handleCreateMsg"
+            @click="handleCreateOrEdit"
           >
             <SendIcon fillColor="#515151" />
           </button>
@@ -100,11 +116,16 @@ const props = defineProps({
   openedChat: {
     type: Array,
   },
+  isEditing: {
+    type: Boolean,
+  },
 });
 const messageInput = ref("");
 const messagesSection = ref(null);
+let isEditing = ref(false);
+let selectedMsg = ref(null);
 
-const emit = defineEmits(["createChat"]);
+const emit = defineEmits(["createMsg", "deleteMsg", "editMsg"]);
 
 onMounted(() => {
   scrollMessagesToBottom();
@@ -120,13 +141,33 @@ const scrollMessagesToBottom = () => {
   }
 };
 
-const handleCreateMsg = () => {
-  const newMgs = {
-    send: true,
-    text: messageInput.value,
-  };
-  emit("createChat", newMgs);
-  messageInput.value = "";
+const handleCreateOrEdit = () => {
+  if (isEditing.value) {
+    emit("editMsg", selectedMsg.value, messageInput.value);
+    messageInput.value = "";
+    isEditing.value = false;
+  } else {
+    const newMgs = {
+      send: true,
+      text: messageInput.value,
+    };
+    if (messageInput.value !== "") {
+      emit("createMsg", newMgs);
+      messageInput.value = "";
+    } else {
+      alert("Seriously?");
+    }
+  }
+};
+
+const handleDeleteMsg = (msg) => {
+  emit("deleteMsg", msg);
+};
+
+const handleEditMsg = (msg) => {
+  isEditing.value = true;
+  messageInput.value = msg.text;
+  selectedMsg.value = msg;
 };
 </script>
 

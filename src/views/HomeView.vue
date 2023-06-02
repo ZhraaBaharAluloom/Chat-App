@@ -40,7 +40,12 @@
       />
     </div>
     <div v-if="open">
-      <MessageView :openedChat="openedChat" @createChat="createChat" />
+      <MessageView
+        :openedChat="openedChat"
+        @createMsg="createMsg"
+        @deleteMsg="deleteMsg"
+        @editMsg="editMsg"
+      />
     </div>
 
     <div v-else>
@@ -72,7 +77,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUpdated, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 
 import ChatView from "./ChatView.vue";
 import MessageView from "./MessageView.vue";
@@ -101,7 +106,7 @@ const getChats = async () => {
     console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
   }
 };
-const createChat = async (newMsg) => {
+const createMsg = async (newMsg) => {
   try {
     const newChat = await axios.post(`http://localhost:3000/chats`, newMsg);
     chatsList.value.push(newChat.data.newChat);
@@ -109,9 +114,50 @@ const createChat = async (newMsg) => {
     console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
   }
 };
+const deleteMsg = async (msg) => {
+  try {
+    const confirmDelete = confirm(
+      "Are you absolutely positive you want to demolish this delicious cookie? It may shed a tear or two... 🍪😐"
+    );
+    if (confirmDelete) {
+      await axios.delete(`http://localhost:3000/chats/${msg.id}`);
+      const msgIndex = chatsList.value.indexOf(msg);
+      chatsList.value.splice(msgIndex, 1);
+      alert("Msg successfully obliterated! 💥😄");
+    } else {
+      alert("Phew! The msg has been spared. It breathes a sigh of relief.");
+    }
+  } catch (error) {
+    console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
+  }
+};
+
+const editMsg = async (selectedMsg, messageInput) => {
+  try {
+    const confirmEdit = confirm(
+      "Are you absolutely positive you want to demolish this message? It may shed a tear or two...😐"
+    );
+    if (confirmEdit) {
+      const editedMsg = await axios.put(
+        `http://localhost:3000/chats/${selectedMsg.id}`,
+        { text: messageInput }
+      );
+      const msgIndex = chatsList.value.indexOf(selectedMsg);
+      chatsList.value.map((msg, index) => {
+        if (msgIndex == index) {
+          Object.assign(msg, editedMsg.data.chat);
+          alert("Msg successfully Edited! 💥😄");
+        }
+      });
+    } else {
+      alert("Okay, it's up to you");
+    }
+  } catch (error) {
+    console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
+  }
+};
 
 const openChat = (message) => {
-  console.log("🚀 ~ file: HomeView.vue:119 ~ openChat ~ message:", message);
   open.value = true;
   openedChat.value = message;
 };
