@@ -21,6 +21,7 @@
       </div>
       <div
         id="MessagesSection"
+        ref="messagesSection"
         class="pt-20 h-[calc(100vh-65px)] w-[calc(100vw-420px)] overflow-auto fixed touch-auto"
       >
         <div
@@ -30,7 +31,13 @@
         >
           <div v-if="chat.send" class="flex w-[calc(100%-100px)]">
             <div class="inline-block bg-gray-100 p-2 rounded-md my-6">
-              {{ chat.text }}
+              <div class="flex gap-4">
+                <span class="flex gap-1">
+                  <MdiTrashCanOutlineIcon :size="18" class="text-red-900" />
+                  <EditIcon :size="18" class="text-gray-600" />
+                </span>
+                {{ chat.text }}
+              </div>
             </div>
           </div>
 
@@ -39,7 +46,13 @@
             class="flex justify-end float-right space-x-1 w-[calc(100%-100px)]"
           >
             <div class="inline-block bg-green-200 p-2 rounded-md my-1">
-              {{ chat.text }}
+              <div class="flex gap-4">
+                {{ chat.text }}
+                <span class="flex gap-1">
+                  <MdiTrashCanOutlineIcon :size="18" class="text-red-900" />
+                  <EditIcon :size="18" class="text-gray-600" />
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -59,6 +72,7 @@
             type="text"
             placeholder="Message"
             v-model="messageInput"
+            @keyup.enter="handleCreateMsg"
           />
           <button
             type="submit"
@@ -74,11 +88,13 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, onUpdated, ref } from "vue";
 import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
 import EmoticonExcitedOutlineIcon from "vue-material-design-icons/EmoticonExcitedOutline.vue";
 import PaperclipIcon from "vue-material-design-icons/Paperclip.vue";
 import SendIcon from "vue-material-design-icons/Send.vue";
+import MdiTrashCanOutlineIcon from "vue-material-design-icons/TrashCan.vue";
+import EditIcon from "vue-material-design-icons/Pencil.vue";
 
 const props = defineProps({
   openedChat: {
@@ -86,8 +102,23 @@ const props = defineProps({
   },
 });
 const messageInput = ref("");
+const messagesSection = ref(null);
 
 const emit = defineEmits(["createChat"]);
+
+onMounted(() => {
+  scrollMessagesToBottom();
+});
+
+onUpdated(() => {
+  scrollMessagesToBottom();
+});
+
+const scrollMessagesToBottom = () => {
+  if (messagesSection.value) {
+    messagesSection.value.scrollTop = messagesSection.value.scrollHeight;
+  }
+};
 
 const handleCreateMsg = () => {
   const newMgs = {
@@ -95,6 +126,7 @@ const handleCreateMsg = () => {
     text: messageInput.value,
   };
   emit("createChat", newMgs);
+  messageInput.value = "";
 };
 </script>
 
