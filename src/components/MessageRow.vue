@@ -12,7 +12,7 @@
       <div class="w-full">
         <div class="flex justify-between items-center">
           <div class="text-[15px] text-gray-600">
-            Username
+            Zahraa
             <!-- {{ username || "Username" }} -->
           </div>
           <div class="text-[12px] text-gray-600 fixed left-60">
@@ -22,9 +22,11 @@
         <div class="flex items-center">
           <CheckAllIcon :size="18" class="mr-1" />
           <div
-            class="text-[15px] text-gray-500 flex items-center justify-between w-full truncate"
+            class="text-[15px] text-gray-500 flex items-center justify-between w-full"
           >
-            {{ chatsList[chatsList.length - 1].text }}
+            <p class="line-clamp-1">
+              {{ chatsList[chatsList.length - 1].text }}
+            </p>
           </div>
         </div>
       </div>

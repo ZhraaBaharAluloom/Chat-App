@@ -12,7 +12,7 @@
               class="rounded-full mx-1 w-10"
             />
             <div class="text-gray=500 ml-1 font-semibold">
-              Username
+              Zahraa
               <!-- {{ openedChat.username || "Username" }} -->
             </div>
           </div>
