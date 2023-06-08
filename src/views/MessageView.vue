@@ -12,8 +12,7 @@
               class="rounded-full mx-1 w-10"
             />
             <div class="text-gray=500 ml-1 font-semibold">
-              Zahraa
-              <!-- {{ openedChat.username || "Username" }} -->
+              {{ user.username || "Zahraa" }}
             </div>
           </div>
           <DotsVerticalIcon fillColor="#515151" />
@@ -29,10 +28,13 @@
           v-for="(chat, index) in openedChat"
           :key="index"
         >
-          <div v-if="chat.send" class="flex w-[calc(100%-100px)]">
+          <div
+            v-if="chat.user?.id !== user.id"
+            class="flex w-[calc(100%-100px)]"
+          >
             <div class="inline-block bg-gray-100 p-2 rounded-md my-6">
               <div class="flex gap-4">
-                <span class="flex gap-1">
+                <!-- <span class="flex gap-1">
                   <MdiTrashCanOutlineIcon
                     :size="18"
                     class="text-red-900 cursor-pointer"
@@ -43,7 +45,7 @@
                     class="text-gray-600 cursor-pointer"
                     @click="handleEditMsg(chat)"
                   />
-                </span>
+                </span> -->
                 {{ chat.text }}
               </div>
             </div>
@@ -119,7 +121,11 @@ const props = defineProps({
   isEditing: {
     type: Boolean,
   },
+  user: {
+    type: Object,
+  },
 });
+
 const messageInput = ref("");
 const messagesSection = ref(null);
 let isEditing = ref(false);
