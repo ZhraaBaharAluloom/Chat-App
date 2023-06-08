@@ -2,7 +2,7 @@
   <div class="">
     <div
       class="flex w-full px-4 py-3 items-center cursor-pointer"
-      @click="openChat(chatsList)"
+      @click="openChat(user?.id)"
     >
       <img
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/2048px-Circle-icons-profile.svg.png"
@@ -14,12 +14,12 @@
           <div class="text-[15px] text-gray-600">
             {{ user?.username || "Zahraa" }}
           </div>
-          <div class="text-[12px] text-gray-600 fixed left-60">
+          <div class="text-[12px] text-gray-600 fixed left-56">
             {{ chatsList[chatsList.length - 1].formattedCreatedDate }}
           </div>
         </div>
         <div class="flex items-center">
-          <CheckAllIcon :size="18" class="mr-1" />
+          <CheckAllIcon :size="18" class="mr-1 text-blue-500" />
           <div
             class="text-[15px] text-gray-500 flex items-center justify-between w-full"
           >

@@ -7,12 +7,18 @@
         >
           <div class="flex items-center">
             <img
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/2048px-Circle-icons-profile.svg.png"
+              :src="
+                chatsList.find((chat) => chat.user.id === openedChat)?.user
+                  .profileImg
+              "
               alt="profile-image"
-              class="rounded-full mx-1 w-10"
+              class="rounded-full mx-1 w-10 h-10"
             />
             <div class="text-gray=500 ml-1 font-semibold">
-              {{ user.username || "Zahraa" }}
+              {{
+                chatsList.find((chat) => chat.user.id === openedChat)?.user
+                  .username || "Username"
+              }}
             </div>
           </div>
           <DotsVerticalIcon fillColor="#515151" />
@@ -25,34 +31,22 @@
       >
         <div
           class="px-12 text-sm"
-          v-for="(chat, index) in openedChat"
+          v-for="(chat, index) in chatsList"
           :key="index"
         >
           <div
-            v-if="chat.user?.id !== user.id"
+            v-if="chat.user.id === openedChat"
             class="flex w-[calc(100%-100px)]"
           >
             <div class="inline-block bg-gray-100 p-2 rounded-md my-6">
               <div class="flex gap-4">
-                <!-- <span class="flex gap-1">
-                  <MdiTrashCanOutlineIcon
-                    :size="18"
-                    class="text-red-900 cursor-pointer"
-                    @click="handleDeleteMsg(chat)"
-                  />
-                  <EditIcon
-                    :size="18"
-                    class="text-gray-600 cursor-pointer"
-                    @click="handleEditMsg(chat)"
-                  />
-                </span> -->
                 {{ chat.text }}
               </div>
             </div>
           </div>
 
           <div
-            v-else
+            v-if="chat.user.id === user?.id"
             class="flex justify-end float-right space-x-1 w-[calc(100%-100px)]"
           >
             <div class="inline-block bg-green-200 p-2 rounded-md my-1">
@@ -116,13 +110,16 @@ import EditIcon from "vue-material-design-icons/Pencil.vue";
 
 const props = defineProps({
   openedChat: {
-    type: Array,
+    type: Number,
   },
   isEditing: {
     type: Boolean,
   },
   user: {
     type: Object,
+  },
+  chatsList: {
+    type: Array,
   },
 });
 
