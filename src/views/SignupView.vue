@@ -21,12 +21,12 @@
               <input
                 type="text"
                 class="peer block min-h-[auto] w-full rounded border-1 border-white bg-transparent px-3 py-[0.32rem] leading-[2.15] outline focus:outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                id="exampleFormControlInput3"
+                id="username"
                 placeholder="Username"
                 v-model="usernameValue"
               />
               <label
-                for="exampleFormControlInput3"
+                for="username"
                 class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[1.15rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
                 >Username*
               </label>
@@ -37,12 +37,12 @@
               <input
                 type="password"
                 class="peer block min-h-[auto] w-full rounded border-0 border-white bg-transparent px-3 py-[0.32rem] leading-[2.15] outline focus:outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                id="exampleFormControlInput33"
+                id="password"
                 placeholder="Password"
                 v-model="passwordValue"
               />
               <label
-                for="exampleFormControlInput33"
+                for="password"
                 class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[1.15rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
                 >Password*
               </label>
@@ -52,12 +52,12 @@
               <input
                 type="text"
                 class="peer block min-h-[auto] w-full rounded border-0 border-white bg-transparent px-3 py-[0.32rem] leading-[2.15] outline focus:outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                id="exampleFormControlInput33"
+                id="profile_image"
                 placeholder="Profile Image"
-                v-model="profileImageVAlue"
+                v-model="profileImageValue"
               />
               <label
-                for="exampleFormControlInput33"
+                for="profile_image"
                 class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[1.15rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
                 >Profile Image (Optional)
               </label>
@@ -92,22 +92,33 @@
 <script setup>
 import axios from "axios";
 import { ref } from "vue";
+import { setUser } from "../services/userUtils";
+import { useRouter } from "vue-router";
 
 const usernameValue = ref("");
 const passwordValue = ref("");
-const profileImageVAlue = ref("");
+const profileImageValue = ref("");
+console.log(
+  "🚀 ~ file: SignupView.vue:101 ~ profileImageValue:",
+  profileImageValue.value
+);
+const router = useRouter();
 
 const signUp = async () => {
   const userCredentials = {
     username: usernameValue.value.trim(),
     password: passwordValue.value.trim(),
-    profileImageVAlue: profileImageVAlue?.value.trim(),
+    profileImg: profileImageValue.value?.trim(),
   };
   try {
     const createdUserToken = await axios.post(
       "http://localhost:3000/auth/signup",
       { ...userCredentials }
     );
+
+    // setUser({ token: createdUserToken.data.token });
+    setUser(createdUserToken.data.token);
+    router.push("/");
   } catch (error) {
     console.log("🚀 ~ file: SignupView.vue:90 ~ signUp ~ error:", error);
   }

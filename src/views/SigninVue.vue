@@ -21,12 +21,12 @@
               <input
                 type="text"
                 class="peer block min-h-[auto] w-full rounded border-1 border-white bg-transparent px-3 py-[0.32rem] leading-[2.15] outline focus:outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                id="exampleFormControlInput3"
+                id="username"
                 placeholder="Username"
                 v-model="usernameValue"
               />
               <label
-                for="exampleFormControlInput3"
+                for="username"
                 class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[1.15rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
                 >Username*
               </label>
@@ -37,12 +37,12 @@
               <input
                 type="password"
                 class="peer block min-h-[auto] w-full rounded border-0 border-white bg-transparent px-3 py-[0.32rem] leading-[2.15] outline focus:outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                id="exampleFormControlInput33"
+                id="password"
                 placeholder="Password"
                 v-model="passwordValue"
               />
               <label
-                for="exampleFormControlInput33"
+                for="password"
                 class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[1.15rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
                 >Password*
               </label>
@@ -76,11 +76,13 @@
 
 <script setup>
 import axios from "axios";
-import { onMounted, ref } from "vue";
-import { checkForToken, setUser } from "../services/userUtils";
+import { ref } from "vue";
+import { setUser } from "../services/userUtils";
+import { useRouter } from "vue-router";
 
 const usernameValue = ref("");
 const passwordValue = ref("");
+const router = useRouter();
 
 const singIn = async () => {
   const userCredentials = {
@@ -92,17 +94,11 @@ const singIn = async () => {
       "http://localhost:3000/auth/signin",
       { ...userCredentials }
     );
-    console.log(
-      "🚀 ~ file: SigninVue.vue:95 ~ singIn ~ createdUserToken:",
-      createdUserToken
-    );
-    setUser(null, createdUserToken.data.token);
+    // setUser({ token: createdUserToken.data.token });
+    setUser(createdUserToken.data.token);
+    router.push("/");
   } catch (error) {
-    console.log("🚀 ~ file: SignupView.vue:90 ~ singIn ~ error:", error);
+    console.log("🚀 ~ file: Signin.vue:90 ~ singIn ~ error:", error);
   }
 };
-
-onMounted(async () => {
-  checkForToken();
-});
 </script>
