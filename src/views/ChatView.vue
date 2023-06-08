@@ -3,7 +3,7 @@
     id="chats"
     class="pt-1 z-0 overflow-auto fixed h-[calc(100vh-100px)] w-[420px]"
   >
-    <MessageRow :chatsList="chatsList" :openChat="openChat" />
+    <MessageRow :chatsList="chatsList" :openChat="openChat" :user="user" />
   </div>
 </template>
 
@@ -17,6 +17,9 @@ const props = defineProps({
   },
   openChat: {
     type: Function,
+  },
+  user: {
+    type: Object,
   },
 });
 </script>
