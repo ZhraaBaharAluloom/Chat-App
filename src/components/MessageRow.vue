@@ -12,8 +12,7 @@
       <div class="w-full">
         <div class="flex justify-between items-center">
           <div class="text-[15px] text-gray-600">
-            Zahraa
-            <!-- {{ username || "Username" }} -->
+            {{ user?.username || "Zahraa" }}
           </div>
           <div class="text-[12px] text-gray-600 fixed left-60">
             {{ chatsList[chatsList.length - 1].formattedCreatedDate }}
@@ -44,6 +43,9 @@ const props = defineProps({
   },
   openChat: {
     type: Function,
+  },
+  user: {
+    type: Object,
   },
 });
 </script>
