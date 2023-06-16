@@ -8,12 +8,11 @@
           <img
             :src="enrolledUser?.profileImg"
             alt="profile-image"
-            class="rounded-full ml-1 w-10"
+            class="rounded-full ml-1 w-10 h-10"
           />
           <span class="text-lg"> Hello {{ enrolledUser?.username }} </span>
         </div>
         <div class="flex items-center justify-center cursor-pointer">
-          <!-- <DotsVerticalIcon fillColor="#515151" class="cursor-pointer" /> -->
           <LogoutIcon fillColor="#880808" class="mr-1" />
           <span @click="signOut" class="text-[#880808]">Logout</span>
         </div>
@@ -29,7 +28,42 @@
             autocomplete="off"
             type="text"
             placeholder="Start a new chat"
+            v-model="searchInputValue"
+            @input="handleSearchUser"
+            @click="handleSearchUser"
           />
+
+          <CloseIcon
+            v-if="showDropdown"
+            @click="handleCloseSearchBar"
+            fillColor="#515151"
+            class="cursor-pointer"
+          />
+        </div>
+        <div
+          v-if="showDropdown"
+          class="mt-1 bg-gray-300 rounded shadow-lg absolute w-full z-10 max-h-[40rem] overflow-y-aut"
+        >
+          <ul class="space-y-2">
+            <li
+              v-for="user in users.filter(
+                (user) => user.id !== enrolledUser.id
+              )"
+              :key="user.id"
+              @click="handleCreateNewChatRoom(user)"
+              class="p-4 flex flex-wrap items-center cursor-pointer transition hover:bg-gray-900 hover:text-white"
+            >
+              <img
+                :src="user.profileImg"
+                alt="movie.name"
+                class="w-10 rounded-md mr-4"
+              />
+              <div class="md:flex-1 py-4">
+                <span class="text-lg font-semibold">{{ user.username }}</span>
+                <p class="line-clamp-3 xl:line-clamp-5"></p>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -39,42 +73,49 @@
     <div v-else>
       <ChatView
         class="mt-[100px]"
-        :usersList="usersList.filter((user) => user.id !== enrolledUser?.id)"
+        :userRooms="
+          usersList.find((user) => user.id == enrolledUser.id)?.chatRooms
+        "
+        :usersList="usersList"
         :chatsList="chatsList"
-        :openChat="openChat"
+        :roomChatsList="roomChatsList"
+        :enrolledUser="enrolledUser"
+        @openChat="openChat"
       />
-    </div>
-    <div v-if="open">
-      <MessageView
-        :openedChat="openedChat"
-        @createMsg="createMsg"
-        @deleteMsg="deleteMsg"
-        @editMsg="editMsg"
-        :chatsList="chatsList"
-        :user="enrolledUser"
-      />
-    </div>
+      <div v-if="open">
+        <MessageView
+          :receivedRoomId="receivedRoomId"
+          :roomChatsList="roomChatsList"
+          :enrolledUser="enrolledUser"
+          :usersList="usersList"
+          :chatsList="chatsList"
+          @createMsg="createMsg"
+          @deleteMsg="deleteMsg"
+          @editMsg="editMsg"
+          @closeChat="closeChat"
+        />
+      </div>
+      <div v-else>
+        <div
+          class="ml-[420px] fixed w-[calc(100vw-420px)] h-[100vh] bg-gray-100 text-center"
+        >
+          <div class="grid h-screen place-items-center">
+            <div>
+              <div class="w-full flex items-center">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/2048px-Circle-icons-profile.svg.png"
+                  alt="profile-image"
+                  width="375"
+                />
+              </div>
 
-    <div v-else>
-      <div
-        class="ml-[420px] fixed w-[calc(100vw-420px)] h-[100vh] bg-gray-100 text-center"
-      >
-        <div class="grid h-screen place-items-center">
-          <div>
-            <div class="w-full flex items-center">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/2048px-Circle-icons-profile.svg.png"
-                alt="profile-image"
-                width="375"
-              />
-            </div>
+              <div class="text-[32px] text-gray-500 font-light mt-10">
+                WhatsApp Web
+              </div>
 
-            <div class="text-[32px] text-gray-500 font-light mt-10">
-              WhatsApp Web
-            </div>
-
-            <div class="text-[14px] text-gray-500 font-light mt-1">
-              Welcome to the real world!
+              <div class="text-[14px] text-gray-500 font-light mt-1">
+                Welcome to the real world!
+              </div>
             </div>
           </div>
         </div>
@@ -84,7 +125,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { setUser } from "../services/userUtils";
@@ -92,26 +133,72 @@ import ChatView from "./ChatView.vue";
 import MessageView from "./MessageView.vue";
 
 // Icons
-import AccountGroupIcon from "vue-material-design-icons/AccountGroup.vue";
-import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
 import LogoutIcon from "vue-material-design-icons/Logout.vue";
+import CloseIcon from "vue-material-design-icons/Close.vue";
 
 import decode from "jwt-decode";
 import axios from "axios";
 
-/* TODO2:
-3. use pinia for state management
-*/
-
 let chatsList = ref([]);
 let usersList = ref([]);
 let open = ref(false);
-let openedChat = ref([]);
 let isLoading = ref(true);
 let enrolledUser = ref(null);
+let roomChatsList = ref();
+let receivedRoomId = ref(null);
+let searchInputValue = ref("");
+let users = ref(null);
+
+const showDropdown = ref(false);
 
 const router = useRouter();
+
+const handleSearchUser = computed(() => {
+  if (searchInputValue.value !== "") {
+    users.value = usersList.value.filter((user) =>
+      user.username.toLowerCase().includes(searchInputValue.value.toLowerCase())
+    );
+  } else {
+    users.value = [...usersList.value];
+  }
+  showDropdown.value = !showDropdown.value;
+});
+
+const handleCloseSearchBar = () => {
+  showDropdown.value = false;
+};
+
+const handleCreateNewChatRoom = async (selectedUser) => {
+  try {
+    let foundUser = usersList.value.find(
+      (user) => user.id == enrolledUser.value.id
+    );
+    let existedChat = selectedUser.chatRooms.filter((chatRoom) => {
+      return foundUser.chatRooms.some((chat) => {
+        return chat.id == chatRoom.id;
+      });
+    });
+    if (existedChat.length > 0) {
+      handleCloseSearchBar();
+    } else {
+      isLoading.value = true;
+      const newRoom = await axios.post(`http://localhost:3000/rooms`, {
+        userTwoId: selectedUser.id,
+      });
+
+      openChat(newRoom.data.newChatRoom.id);
+      handleCloseSearchBar();
+      isLoading.value = false;
+      getUsers();
+    }
+  } catch (error) {
+    console.log(
+      "🚀 ~ file: HomeView.vue:163 ~ handleCreateNewChatRoom ~ error:",
+      error
+    );
+  }
+};
 
 const getChats = async () => {
   try {
@@ -123,9 +210,13 @@ const getChats = async () => {
     console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
   }
 };
-const createMsg = async (newMsg) => {
+const createMsg = async (roomId, newMsg) => {
   try {
-    const newChat = await axios.post(`http://localhost:3000/chats`, newMsg);
+    const newChat = await axios.post(
+      `http://localhost:3000/rooms/${roomId}/chats`,
+      newMsg
+    );
+
     chatsList.value.push(newChat.data.newChat);
   } catch (error) {
     console.log("🚀 ~ file: HomeView.vue:88 ~ getChats ~ error:", error);
@@ -140,6 +231,7 @@ const deleteMsg = async (msg) => {
       await axios.delete(`http://localhost:3000/chats/${msg.id}`);
       const msgIndex = chatsList.value.indexOf(msg);
       chatsList.value.splice(msgIndex, 1);
+      roomChatsList.value.splice(msgIndex, 1);
       alert("Msg successfully obliterated! 💥😄");
     } else {
       alert("Phew! The msg has been spared. It breathes a sigh of relief.");
@@ -160,7 +252,13 @@ const editMsg = async (selectedMsg, messageInput) => {
         { text: messageInput }
       );
       const msgIndex = chatsList.value.indexOf(selectedMsg);
-      chatsList.value.map((msg, index) => {
+      // chatsList.value.map((msg, index) => {
+      //   if (msgIndex == index) {
+      //     Object.assign(msg, editedMsg.data.chat);
+      //     alert("Msg successfully Edited! 💥😄");
+      //   }
+      // });
+      roomChatsList.value.map((msg, index) => {
         if (msgIndex == index) {
           Object.assign(msg, editedMsg.data.chat);
           alert("Msg successfully Edited! 💥😄");
@@ -174,18 +272,35 @@ const editMsg = async (selectedMsg, messageInput) => {
   }
 };
 
-const openChat = (userId) => {
+const openChat = (roomId) => {
+  isLoading.value = true;
+  // let foundRoomChats = chatsList.value.filter(
+  //   (chat) => chat.room?.id === roomId
+  // );
+
+  receivedRoomId.value = roomId;
+
+  roomChatsList.value = chatsList.value;
+
+  isLoading.value = false;
   open.value = true;
-  openedChat.value = userId;
 };
 
-const getUsersChats = async () => {
+const closeChat = () => {
+  open.value = false;
+};
+
+const getUsers = async () => {
   try {
+    isLoading.value = true;
+
     const users = await axios.get(`http://localhost:3000/auth/users`);
 
     usersList.value = users.data.users;
+
+    isLoading.value = false;
   } catch (error) {
-    console.log("🚀 ~ file: HomeView.vue:182 ~ getUsersChats ~ error:", error);
+    console.log("🚀 ~ file: HomeView.vue:182 ~ getUsers ~ error:", error);
   }
 };
 
@@ -207,7 +322,7 @@ const checkForToken = () => {
 
 onMounted(async () => {
   await getChats();
-  getUsersChats();
+  getUsers();
   await checkForToken();
 });
 </script>
