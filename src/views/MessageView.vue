@@ -8,20 +8,25 @@
           <div class="flex items-center">
             <img
               :src="
-                chatsList.find((chat) => chat.user.id === openedChat)?.user
-                  .profileImg
+                filteredChats.find((chat) => chat.user?.id !== enrolledUser?.id)
+                  ?.user?.profileImg || notEnrolledUsers[0].profileImg
               "
               alt="profile-image"
               class="rounded-full mx-1 w-10 h-10"
             />
             <div class="text-gray=500 ml-1 font-semibold">
               {{
-                chatsList.find((chat) => chat.user.id === openedChat)?.user
-                  .username || "Username"
+                filteredChats.find(
+                  (chat) => chat.user?.id !== props.enrolledUser?.id
+                )?.user?.username || notEnrolledUsers[0].username
               }}
             </div>
           </div>
-          <DotsVerticalIcon fillColor="#515151" />
+          <CloseIcon
+            @click="handleCloseChat"
+            fillColor="#515151"
+            class="cursor-pointer"
+          />
         </div>
       </div>
       <div
@@ -31,11 +36,11 @@
       >
         <div
           class="px-12 text-sm"
-          v-for="(chat, index) in chatsList"
+          v-for="(chat, index) in filteredChats"
           :key="index"
         >
           <div
-            v-if="chat.user.id === openedChat"
+            v-if="chat.user?.id !== enrolledUser.id"
             class="flex w-[calc(100%-100px)]"
           >
             <div class="inline-block bg-gray-100 p-2 rounded-md my-6">
@@ -46,7 +51,7 @@
           </div>
 
           <div
-            v-if="chat.user.id === user?.id"
+            v-else
             class="flex justify-end float-right space-x-1 w-[calc(100%-100px)]"
           >
             <div class="inline-block bg-green-200 p-2 rounded-md my-1">
@@ -100,8 +105,8 @@
 </template>
 
 <script setup>
-import { onMounted, onUpdated, ref } from "vue";
-import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
+import { computed, onMounted, onUpdated, ref, watch } from "vue";
+import CloseIcon from "vue-material-design-icons/Close.vue";
 import EmoticonExcitedOutlineIcon from "vue-material-design-icons/EmoticonExcitedOutline.vue";
 import PaperclipIcon from "vue-material-design-icons/Paperclip.vue";
 import SendIcon from "vue-material-design-icons/Send.vue";
@@ -109,18 +114,42 @@ import MdiTrashCanOutlineIcon from "vue-material-design-icons/TrashCan.vue";
 import EditIcon from "vue-material-design-icons/Pencil.vue";
 
 const props = defineProps({
-  openedChat: {
-    type: Number,
-  },
   isEditing: {
     type: Boolean,
   },
-  user: {
+  roomChatsList: {
+    type: Array,
+  },
+  enrolledUser: {
     type: Object,
+  },
+  receivedRoomId: {
+    type: Number,
+  },
+
+  usersList: {
+    type: Array,
   },
   chatsList: {
     type: Array,
   },
+});
+
+const filteredChats = computed(() => {
+  return props.chatsList.filter(
+    (chat) => chat.room?.id === props.receivedRoomId
+  );
+});
+
+const notEnrolledUsers = computed(() => {
+  return props.usersList.filter((user) => {
+    return (
+      user.id !== props.enrolledUser.id &&
+      user.chatRooms.some((room) => {
+        return room.id === props.receivedRoomId;
+      })
+    );
+  });
 });
 
 const messageInput = ref("");
@@ -128,7 +157,7 @@ const messagesSection = ref(null);
 let isEditing = ref(false);
 let selectedMsg = ref(null);
 
-const emit = defineEmits(["createMsg", "deleteMsg", "editMsg"]);
+const emit = defineEmits(["createMsg", "deleteMsg", "editMsg", "closeChat"]);
 
 onMounted(() => {
   scrollMessagesToBottom();
@@ -151,11 +180,11 @@ const handleCreateOrEdit = () => {
     isEditing.value = false;
   } else {
     const newMgs = {
-      send: true,
       text: messageInput.value,
     };
+
     if (messageInput.value !== "") {
-      emit("createMsg", newMgs);
+      emit("createMsg", props.receivedRoomId, newMgs);
       messageInput.value = "";
     } else {
       alert("Seriously?");
@@ -171,6 +200,10 @@ const handleEditMsg = (msg) => {
   isEditing.value = true;
   messageInput.value = msg.text;
   selectedMsg.value = msg;
+};
+
+const handleCloseChat = () => {
+  emit("closeChat");
 };
 </script>
 
