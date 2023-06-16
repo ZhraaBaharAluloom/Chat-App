@@ -4,11 +4,15 @@
     class="pt-1 z-0 overflow-auto fixed h-[calc(100vh-100px)] w-[420px]"
   >
     <MessageRow
-      v-for="user in usersList"
-      :key="user.id"
+      v-for="(room, index) in userRooms"
+      :key="index"
+      @openChat="handleOpenChat"
+      :room="room"
       :chatsList="chatsList"
-      :openChat="openChat"
-      :user="user"
+      :enrolledUser="enrolledUser"
+      :notEnrolledUSer="notEnrolledUSer"
+      :roomChatsList="roomChatsList"
+      :usersList="usersList"
     />
   </div>
 </template>
@@ -18,19 +22,34 @@
 import MessageRow from "../components/MessageRow.vue";
 
 const props = defineProps({
+  userRooms: {
+    type: Object,
+  },
+
   chatsList: {
     type: Array,
   },
-  openChat: {
-    type: Function,
+
+  roomChatsList: {
+    type: Array,
+  },
+
+  enrolledUser: {
+    type: Object,
+  },
+  notEnrolledUSer: {
+    type: Object,
   },
   usersList: {
     type: Array,
   },
 });
-// console.log("🚀 ~ file: ChatView.vue:31 ~ usersList:", usersList)
-// console.log("🚀 ~ file: ChatView.vue:31 ~ chatsList:", chatsList)
-// console.log("🚀 ~ file: ChatView.vue:31 ~ openChat:", props.openChat)
+
+const emits = defineEmits(["openChat"]);
+
+const handleOpenChat = (roomId) => {
+  emits("openChat", roomId);
+};
 </script>
 
 <style scoped></style>
