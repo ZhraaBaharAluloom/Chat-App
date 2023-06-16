@@ -98,10 +98,7 @@ import { useRouter } from "vue-router";
 const usernameValue = ref("");
 const passwordValue = ref("");
 const profileImageValue = ref("");
-console.log(
-  "🚀 ~ file: SignupView.vue:101 ~ profileImageValue:",
-  profileImageValue.value
-);
+
 const router = useRouter();
 
 const signUp = async () => {
